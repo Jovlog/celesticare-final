@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE_URL } from '../../api/axios';
 import styles from './GetToKnow.module.css';
 
 // Exact zodiac date calculation logic from get_to_know.php
@@ -31,8 +32,6 @@ function setCookie(name, value, days = 30) {
   date.setTime(date.getTime() + days * 86400 * 1000);
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${date.toUTCString()}; path=/`;
 }
-
-const API_BASE = window.location.port === '5173' ? 'http://localhost:5000' : '';
 
 export default function GetToKnow() {
   const navigate = useNavigate();
@@ -91,7 +90,7 @@ export default function GetToKnow() {
     const effectiveUserId = user?.id || user?.sql_id;
     if (effectiveUserId) {
       try {
-        await fetch(`${API_BASE}/api/user/profile`, {
+        await fetch(`${API_BASE_URL}/user/profile`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',

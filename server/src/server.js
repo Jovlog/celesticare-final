@@ -14,6 +14,7 @@ import outfitRoutes from './routes/outfitRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import { saveUndertone, getRecentTarot } from './controllers/userController.js';
 import { verifyToken } from './middlewares/authMiddleware.js';
+import { getAllowedOrigins } from './config/corsOptions.js';
 
 dotenv.config();
 connectDB();
@@ -23,17 +24,12 @@ const app = express();
 app.use(helmet());
 
 // Dynamic CORS configuration allowing localhost and any *.vercel.app domain
-const envAllowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim().replace(/\/$/, ''))
-  : ['http://localhost:5173', 'http://127.0.0.1:5173', 'https://celesticare-final.vercel.app'];
+const allowedOrigins = getAllowedOrigins();
 
 const dynamicCorsOptions = {
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    const isExplicitlyAllowed = envAllowedOrigins.includes(origin);
-    const isVercelDomain = origin.endsWith('.vercel.app');
-
-    if (isExplicitlyAllowed || isVercelDomain) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error(`CORS policy rejection: Origin ${origin} not allowed.`));

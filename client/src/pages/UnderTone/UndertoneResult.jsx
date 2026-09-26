@@ -194,6 +194,7 @@ export default function UndertoneResult() {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setModalError('');
+    setModalMessage('');
     setModalLoading(true);
 
     try {
@@ -222,6 +223,7 @@ export default function UndertoneResult() {
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setModalError('');
+    setModalMessage('');
 
     if (regPassword !== regConfirm) {
       setModalError('Passwords do not match!');
@@ -249,11 +251,7 @@ export default function UndertoneResult() {
     try {
       const res = await register(registerPayload);
       if (res.success) {
-        setModalMessage('Account created! Entering your dashboard...');
-        clearGuestSession();
-        await fetchUserProfile();
-        setActiveModal(null);
-        navigate(`/dashboard${isMobile ? '?mobile=1' : ''}`);
+        setModalMessage(res.message || 'Account created. Check your email for a verification link, then log in.');
       } else {
         setModalError(res.error || 'Registration failed.');
       }
@@ -431,7 +429,7 @@ export default function UndertoneResult() {
             {modalError && <div className={styles.alertDanger}>{modalError}</div>}
             {modalMessage && <div className={styles.alertSuccess}>{modalMessage}</div>}
 
-            <form onSubmit={handleRegisterSubmit}>
+            {!modalMessage && <form onSubmit={handleRegisterSubmit}>
               <input
                 type="email"
                 className={styles.formControl}
@@ -492,7 +490,15 @@ export default function UndertoneResult() {
                   Login
                 </span>
               </p>
-            </form>
+            </form>}
+            {modalMessage && (
+              <p className={styles.textMuted}>
+                After verifying your email,{' '}
+                <span onClick={() => { setModalMessage(''); setModalError(''); setActiveModal('login'); }}>
+                  log in
+                </span>{' '}to save your results.
+              </p>
+            )}
           </div>
         </div>
       )}

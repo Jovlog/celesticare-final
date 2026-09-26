@@ -29,6 +29,13 @@ export const verifyToken = async (req, res, next) => {
       });
     }
 
+    if (!currentUser.isVerified) {
+      return res.status(403).json({
+        status: 'fail',
+        message: 'Please verify your email address before accessing this account.'
+      });
+    }
+
     req.user = currentUser;
     next();
   } catch (err) {

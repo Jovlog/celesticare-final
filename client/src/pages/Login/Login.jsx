@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Login.module.css';
 
@@ -17,6 +17,7 @@ function clearGuestSession() {
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login, fetchUserProfile } = useAuth();
   
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -66,6 +67,13 @@ export default function Login() {
       <div className={styles.loginBox}>
         <div className={styles.brandTitle}>CELESTICARE</div>
         <div className={styles.loginHeading}>Log in to your profile</div>
+
+        {searchParams.get('verified') === '1' && (
+          <div className={styles.alertSuccess}>Email verified. You can now log in.</div>
+        )}
+        {searchParams.get('verified') === '0' && (
+          <div className={styles.alertDanger}>That verification link is invalid or expired.</div>
+        )}
 
         {errorMessage && (
           <div className={styles.alertDanger}>

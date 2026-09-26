@@ -1,10 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { API_BASE_URL } from '../api/axios';
 
 const AuthContext = createContext();
-
-const API_BASE = import.meta.env.PROD 
-  ? '/api' 
-  : 'https://celesticare-api.onrender.com/api';
   
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -27,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/auth/me`, {
+      const res = await fetch(`${API_BASE_URL}/auth/me`, {
         method: 'GET',
         mode: 'cors',
         credentials: 'omit',
@@ -55,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'omit',
@@ -88,7 +85,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const res = await fetch(`${API_BASE}/auth/register`, {
+      const res = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'omit',
@@ -106,10 +103,7 @@ export const AuthProvider = ({ children }) => {
         };
       }
 
-      localStorage.setItem('token', data.token);
-      setToken(data.token);
-      setUser(data.user);
-      return { success: true, user: data.user };
+      return { success: true, requiresVerification: data.requiresVerification, message: data.message };
     } catch (err) {
       console.error('[AuthContext] Registration connection error:', err);
       return { 
@@ -122,7 +116,7 @@ export const AuthProvider = ({ children }) => {
   const updateUserProfile = async (updates) => {
     const activeToken = token || localStorage.getItem('token');
     try {
-      const res = await fetch(`${API_BASE}/user/profile`, {
+      const res = await fetch(`${API_BASE_URL}/user/profile`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'omit',

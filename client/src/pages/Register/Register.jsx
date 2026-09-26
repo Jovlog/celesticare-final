@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Register.module.css';
 
 export default function Register() {
-  const navigate = useNavigate();
   const { register } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -15,6 +14,7 @@ export default function Register() {
     admin_secret: ''
   });
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const isAdminDomain = formData.email.trim().toLowerCase().endsWith('@celesticare.admin.com');
@@ -37,7 +37,7 @@ export default function Register() {
     try {
       const result = await register(formData);
       if (result.success) {
-        navigate('/get-to-know');
+        setSuccessMessage(result.message || 'Check your email for a verification link, then log in.');
       } else {
         setErrorMessage(result.error || 'Registration failed.');
       }
@@ -60,7 +60,13 @@ export default function Register() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        {successMessage && (
+          <div className={styles.alertSuccess}>
+            {successMessage} <Link to="/login">Log in</Link>
+          </div>
+        )}
+
+        {!successMessage && <form onSubmit={handleSubmit}>
           <div>
             <input
               type="text"
@@ -126,7 +132,7 @@ export default function Register() {
           <button type="submit" className={styles.btnLogin} disabled={loading}>
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
-        </form>
+        </form>}
 
         <div className={styles.textMuted}>
           Already have a profile? <Link to="/login">Log in</Link>
